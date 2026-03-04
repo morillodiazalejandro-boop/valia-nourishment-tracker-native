@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Loading...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background: #ffffff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .loader { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+
+    <script src="network-listener.js"></script>
+    <script src="onesignal-init.js"></script>
+    
+    <script src="revenuecat-init.js"></script>
+    <script>
+        document.addEventListener('deviceready', function() {
+            if (window.Capacitor && window.Capacitor.getPlatform() === 'ios') {
+                Purchases.configure({ apiKey: "test_JhCXugXMjPdVXHRDrefpAYMjBjK" });
+            } else if (window.Capacitor && window.Capacitor.getPlatform() === 'android') {
+                Purchases.configure({ apiKey: "test_JhCXugXMjPdVXHRDrefpAYMjBjK" });
+            }
+        }, false);
+    </script>
+
+    <script>
+        // Redirect Logic
+        setTimeout(() => {
+            window.location.href = "https://app.valia.bio";
+        }, 100); // Short delay to ensure plugins attach
+    </script>
+</head>
+<body>
+    <div class="loader"></div>
+</body>
+</html>
+    
