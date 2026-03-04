@@ -1,0 +1,47 @@
+workflows:
+  appthunder-build:
+    name: AppThunder Native Build
+    instance_type: mac_mini_m1
+    max_build_duration: 60
+    environment:
+      groups:
+        - apple_credentials
+      java: 17
+      node: latest
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Install dependencies
+        script: npm install
+      - name: Generate Native Assets
+        script: |
+          npm install @capacitor/assets --save-dev
+          npx capacitor-assets generate --iconBackgroundColor '#ffffff' --splashBackgroundColor '#ffffff'
+      - name: AppThunder Initialization
+        script: |
+          rm -rf ios android
+          npx cap add android || true
+          npx cap add ios || true
+          npx cap sync
+
+      - name: Build Android (.aab)
+        script: |
+          export JAVA_HOME=$(/usr/libexec/java_home -v 17 2>/dev/null || echo $JAVA_HOME)
+          cd android && ./gradlew bundleRelease
+      - name: Build iOS (.ipa)
+        script: |
+          if [ -d "ios/App/App.xcworkspace" ]; then
+            xcode-project build-ipa --workspace "ios/App/App.xcworkspace" --scheme "App"
+          else
+            xcode-project build-ipa --project "ios/App/App.xcodeproj" --scheme "App"
+          fi
+    artifacts:
+      - android/app/build/outputs/bundle/release/*.aab
+      - build/ios/ipa/*.ipa
+
+  publishing:
+    ios:
+      app_store_connect:
+        issuer_id: $APP_STORE_ISSUER_ID
+        key_id: $APP_STORE_KEY_ID
+        private_key: $APP_STORE_PRIVATE_KEY
